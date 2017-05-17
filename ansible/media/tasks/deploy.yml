@@ -64,3 +64,13 @@
 - name: Copy motion detecion file
   shell: "cp {{build_dir}}/priv_dir/elixir_motiondetection.so {{remote_media_dir}}/priv_dir/"
   when: motion_detection_file.stat.exists == True
+
+- name: Get evercam-media last commit message
+  local_action:
+    shell
+    chdir={{local_media_dir}}
+    git log -1 --pretty=%B | cat
+  register: local_commit_message
+
+- name: Add deploy track
+  shell: "curl -X POST 'https://api.newrelic.com/v2/applications/{{newrelic_app_id}}/deployments.json' -H 'X-Api-Key:{{new_relic_api_key}}' -i -H 'Content-Type: application/json' -d '{ \"deployment\": { \"revision\": \"{{local_commit_hash.stdout}}\", \"changelog\": \"\", \"description\": \"{{local_commit_message.stdout}}\", \"user\": \"{{deploy_user}}\" }}'"
