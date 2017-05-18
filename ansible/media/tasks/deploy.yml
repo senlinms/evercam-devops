@@ -69,7 +69,7 @@
   local_action:
     shell
     chdir={{local_media_dir}}
-    git log -1 --pretty=%B | cat
+    git log -n 1 --pretty=format:%s $hash
   register: local_commit_message
 
 - name: Add deploy track
