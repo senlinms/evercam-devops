@@ -5,13 +5,13 @@
   tags: deploy
 
 - name: Stop evercam-media
-  shell: stop evercam_media
+  shell: systemctl stop evercam_media.service
   sudo: yes
   failed_when: False
   tags: deploy
 
 - name: Start evercam-media
-  shell: start evercam_media
+  shell: systemctl start evercam_media.service
   sudo: yes
   failed_when: False
   tags: deploy
