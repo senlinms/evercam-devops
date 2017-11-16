@@ -5,26 +5,22 @@
     owner: "{{ansible_ssh_user}}"
   sudo: yes
 
-- name: Ensure /usr/local/bin dir exists
+- name: Ensure /etc/systemd/system dir exists
   file:
-    path: /usr/local/bin
+    path: /etc/systemd/system
     state: directory
   sudo: yes
 
-- name: Copy evercam_media run init script
+- name: Copy evercam_media service
   sudo: yes
   template:
-    src: run_evercam_media.sh.j2
-    dest: /usr/local/bin/run_evercam_media.sh
+    src: evercam_media.service.j2
+    dest: /etc/systemd/system/evercam_media.service
     owner: root
     group: root
     mode: 0755
 
-- name: Install the evercam_media init script
+- name: Enable the evercam_media service
+  shell: systemctl enable evercam_media.service
   sudo: yes
-  template:
-    src: evercam_media.conf.j2
-    dest: /etc/init/evercam_media.conf
-    owner: root
-    group: root
-    mode: 0755
+  failed_when: False
