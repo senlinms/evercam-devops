@@ -76,4 +76,4 @@
   shell: "curl -X POST 'https://api.newrelic.com/v2/applications/{{newrelic_app_id}}/deployments.json' -H 'X-Api-Key:{{new_relic_api_key}}' -i -H 'Content-Type: application/json' -d '{ \"deployment\": { \"revision\": \"{{local_commit_hash.stdout}}\", \"changelog\": \"\", \"description\": \"{{local_commit_message.stdout}}\", \"user\": \"{{deploy_user}}\" }}'"
 
 - name: Send deploy email
-  shell: "curl -s --user 'api:{{mailgun_key}}' {{mailgun_domain}}/messages -F from='Evercam <support@evercm.io>' -F to=devs@evercam.io -F subject='Evercam Server New Deploy' --form-string html='<html>{{deploy_user}} deployed app: {{local_commit_hash.stdout}}<br />Azhar Malik: {{local_commit_message.stdout}}</html>'"
+  shell: "curl -s --user 'api:{{mailgun_key}}' {{mailgun_domain}}/messages -F from='noreply <support@evercm.io>' -F to=devs@evercam.io -F subject='Evercam Server New Deploy' --form-string html='<html>{{deploy_user}} deployed app: {{local_commit_hash.stdout}}<br />Azhar Malik: {{local_commit_message.stdout}}</html>'"
