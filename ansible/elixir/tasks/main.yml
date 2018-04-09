@@ -1,3 +1,18 @@
+- name: Check if Goon is present
+  stat:
+    path: /root/.asdf
+  register: asdf_present
+
+- name: Install asdf
+  shell: git clone https://github.com/asdf-vm/asdf.git ~/.asdf --branch v0.2.0
+  sudo: yes
+  when: asdf_present.stat.exists == False
+
+- name: Echo asdf commands
+  command: "echo '. $HOME/.asdf/asdf.sh' >> ~/.bashrc && echo '. $HOME/.asdf/completions/asdf.bash' >> ~/.bashrc"
+  sudo_user: "{{ user_name }} -i"
+  when: asdf_present.stat.exists == False
+
 - name: Source asdf in bashrc
   lineinfile:
     line: "source /home/{{user_name}}/.asdf/asdf.sh"
@@ -7,7 +22,7 @@
   sudo_user: "{{ user_name }} -i"
 
 - name: Add asdf plugins for Elixir and Erlang
-  command: "bash -lc 'asdf plugin-add {{item}} https://github.com/HashNuke/asdf-{{item}}.git'"
+  command: "bash -lc 'asdf plugin-add {{item}} https://github.com/asdf-vm/asdf-{{item}}.git'"
   with_items:
     - erlang
     - elixir
@@ -17,6 +32,7 @@
 - name: Install Erlang using asdf
   command: "bash -lc 'asdf install erlang 19.3'"
   sudo_user: "{{ user_name }} -i"
+  sudo: yes
 
 - name: Set Erlang version using asdf
   command: "bash -lc 'asdf global erlang 19.3'"
@@ -25,6 +41,7 @@
 - name: Install Elixir using asdf
   command: "bash -lc 'asdf install elixir 1.5.2'"
   sudo_user: "{{ user_name }} -i"
+  sudo: yes
 
 - name: Set Elixir version using asdf
   command: "bash -lc 'asdf global elixir 1.5.2'"
