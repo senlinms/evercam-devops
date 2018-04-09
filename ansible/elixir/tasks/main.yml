@@ -23,11 +23,11 @@
   sudo_user: "{{ user_name }} -i"
 
 - name: Install Elixir using asdf
-  command: "bash -lc 'asdf install elixir 1.4.1'"
+  command: "bash -lc 'asdf install elixir 1.5.2'"
   sudo_user: "{{ user_name }} -i"
 
 - name: Set Elixir version using asdf
-  command: "bash -lc 'asdf global elixir 1.4.1'"
+  command: "bash -lc 'asdf global elixir 1.5.2'"
   sudo_user: "{{ user_name }} -i"
 
 - name: Install hex
