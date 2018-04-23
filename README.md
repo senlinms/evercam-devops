@@ -1,5 +1,9 @@
 ## Evercam Development Environment Setup
 
+If you want to configure evercam server without vagrant and ansible then follow the instructions provided here: https://github.com/evercam/evercam-devops/wiki/Evercam-Configuration
+
+Otherwise, follow the instructions bellow.
+
 This repo is used for automated provisioning and configuration of developer and production environments needed to run Evercam system. This README will explain how to setup the developer environment.
 
 When finished with the README, you will have a Vagrant Virtual Machine running Ubuntu 14.04 LTS with the following software:
