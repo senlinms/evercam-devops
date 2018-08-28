@@ -38,7 +38,7 @@
     chdir: "{{build_dir}}"
 
 - name: Register the version of the release
-  shell: "cat {{build_dir}}/rel/evercam_media/releases/start_erl.data | awk '{print $2}'"
+  shell: "cat {{build_dir}}/_build/prod/rel/evercam_media/releases/start_erl.data | awk '{print $2}'"
   register: evercam_media_version
 
 - name: Ensure there is a directory for the application
@@ -47,7 +47,7 @@
 - name: Copy the release to the application directory
   unarchive:
     copy: no
-    src: "{{build_dir}}/rel/evercam_media/releases/{{evercam_media_version.stdout}}/evercam_media.tar.gz"
+    src: "{{build_dir}}/_build/prod/rel/evercam_media/releases/{{evercam_media_version.stdout}}/evercam_media.tar.gz"
     dest: "{{remote_media_dir}}"
 
 - name: Check if motion detection file exists
