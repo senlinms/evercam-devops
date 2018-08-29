@@ -1,0 +1,73 @@
+- name: Register evercam-media local commit hash
+  local_action:
+    shell
+    chdir={{local_media_dir}}
+    git rev-parse --short HEAD
+  register: local_commit_hash
+
+- name: List files in build directory
+  command: "ls {{build_dir}}/_build"
+  register: dir_out
+
+- name: Stat build directory
+  stat: path={{build_dir}}/_build
+  register: _build
+
+- name: Clone evercam-media
+  git:
+    repo: https://github.com/evercam/evercam-media
+    dest: "{{build_dir}}/"
+    version: "{{local_commit_hash.stdout}}"
+
+- name: Get evercam-media dependencies
+  shell: "bash -lc '{{mix_env_vars}} {{media_env_vars}} mix deps.get'"
+  args:
+    chdir: "{{build_dir}}"
+
+- name: Compile evercam-media application
+  shell: "bash -lc '{{mix_env_vars}} {{media_env_vars}} mix compile'"
+  args:
+    chdir: "{{build_dir}}"
+  failed_when: False
+
+- name: Compile again so any flaky dependencies are recompiled
+  shell: "bash -lc '{{mix_env_vars}} {{media_env_vars}} mix compile'"
+  args:
+    chdir: "{{build_dir}}"
+
+- name: Build evercam-media application release
+  shell: "bash -lc '{{mix_env_vars}} {{media_env_vars}} mix release --upgrade'"
+  args:
+    chdir: "{{build_dir}}"
+
+- name: Register the version of the release
+  shell: "cat {{build_dir}}/_build/prod/rel/evercam_media/releases/start_erl.data | awk '{print $2}'"
+  register: evercam_media_version
+
+- name: Ensure there is a directory for the application
+  file: path="{{remote_media_dir}}" state=directory
+
+- name: Copy new release to {{remote_media_dir}}
+  command: cp -r {{build_dir}}/_build/prod/rel/evercam_media/releases/{{evercam_media_version.stdout}} {{remote_media_dir}}/releases/{{evercam_media_version.stdout}}
+
+- name: Get evercam-media last commit message
+  local_action:
+    shell
+    chdir={{local_media_dir}}
+    git log -n 1 --pretty=format:%s $hash
+  register: local_commit_message
+
+- name: Upgrade to new version
+  command: "{{remote_media_dir}}/bin/evercam_media upgrade {{evercam_media_version.stdout}}"
+
+- name: Add deploy track
+  shell: "curl -X POST 'https://api.newrelic.com/v2/applications/{{newrelic_app_id}}/deployments.json' -H 'X-Api-Key:{{new_relic_api_key}}' -i -H 'Content-Type: application/json' -d '{ \"deployment\": { \"revision\": \"{{local_commit_hash.stdout}}\", \"changelog\": \"\", \"description\": \"{{local_commit_message.stdout}}\", \"user\": \"{{deploy_user}}\" }}'"
+
+- name: Send deploy email
+  shell: "curl -s --user 'api:{{mailgun_key}}' {{mailgun_domain}}/messages -F from='noreply <support@evercam.io>' -F to=devs@evercam.io -F subject='Evercam Server New Deploy (HotCode)' --form-string html='<html>{{deploy_user}} deployed app: {{local_commit_hash.stdout}}<br />Junaid Farooq: {{local_commit_message.stdout}}</html>'"
+
+- name: Display post upgrade message
+  debug:
+    msg:
+      - 'Evercam Server release has been upgraded.'
+      - '- New Version: {{evercam_media_version.stdout}}'

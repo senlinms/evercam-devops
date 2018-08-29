@@ -4,6 +4,9 @@
 - include: deploy.yml
   tags: deploy
 
+- include: hotcode.yml
+  tags: hotcode
+
 - name: Stop evercam-media
   shell: systemctl stop evercam_media.service
   sudo: yes
