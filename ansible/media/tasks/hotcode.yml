@@ -24,6 +24,11 @@
   args:
     chdir: "{{build_dir}}"
 
+- name: Touch mix file for new build release.
+  shell: "bash -lc 'touch mix.exs'"
+  args:
+    chdir: "{{build_dir}}"
+
 - name: Compile evercam-media application
   shell: "bash -lc '{{mix_env_vars}} {{media_env_vars}} mix compile'"
   args:
@@ -32,11 +37,6 @@
 
 - name: Compile again so any flaky dependencies are recompiled
   shell: "bash -lc '{{mix_env_vars}} {{media_env_vars}} mix compile'"
-  args:
-    chdir: "{{build_dir}}"
-
-- name: Touch mix file for new build release.
-  shell: "bash -lc 'touch mix.exs'"
   args:
     chdir: "{{build_dir}}"
 
