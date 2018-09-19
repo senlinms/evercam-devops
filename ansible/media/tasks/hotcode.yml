@@ -49,6 +49,9 @@
   shell: "cat {{build_dir}}/_build/prod/rel/evercam_media/releases/start_erl.data | awk '{print $2}'"
   register: evercam_media_version
 
+- name: Describe the generated APPUP
+  shell: "cat {{build_dir}}/_build/prod/rel/evercam_media/lib/evercam_media-{{evercam_media_version.stdout}}/ebin/evercam_media.appup"
+
 - name: Ensure there is a directory for the application
   file: path="{{remote_media_dir}}" state=directory
 
